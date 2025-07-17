@@ -1,0 +1,59 @@
+# For configs in docker containers, use 0.0.0.0 to enable outside access
+# For configs on the machine, use localhost to avoid exposing all traffic to the collector
+
+extensions:
+  health_check:
+  pprof:
+    endpoint: 0.0.0.0:1777
+  zpages:
+    endpoint: 0.0.0.0:55679
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+  # Collect own metrics
+  prometheus:
+    config:
+      scrape_configs:
+      - job_name: 'otel-collector'
+        scrape_interval: 10s
+        static_configs:
+        - targets: ['0.0.0.0:8888']
+
+processors:
+  batch:
+  # processors:
+  #   memory_limiter:
+  #     check_interval: 5s
+  #     limit_mib: 500
+
+exporters:
+  debug:
+    verbosity: detailed
+  prometheus:
+    endpoint: collector:8889
+  otlp/tempo:
+    endpoint: tempo:4317
+    tls:
+      insecure: true
+
+service:
+
+  pipelines:
+
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp/tempo]
+
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [prometheus]
+
+  extensions: [health_check, pprof, zpages]

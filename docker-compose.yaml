@@ -1,0 +1,81 @@
+networks:
+  vispyr:
+    external: true
+
+services:
+  init:
+    image: &tempoImage grafana/tempo
+    user: root
+    entrypoint:
+      - "chown"
+      - "10001:10001"
+      - "/var/tempo"
+    volumes:
+      - ./tempo/data:/var/tempo
+
+  tempo:
+    image: *tempoImage
+    command: ["-config.file=/etc/tempo.yaml"]
+    container_name: tempo
+    networks:
+      - vispyr
+    volumes:
+      - ./tempo/tempo.yaml:/etc/tempo.yaml
+      - ./tempo/data:/var/tempo
+    ports:
+      - "3200:3200" # tempo
+    depends_on:
+      - init
+
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    networks:
+      - vispyr
+    volumes:
+      - ./prometheus/prom-config.yaml:/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+
+  pyroscope:
+    image: grafana/pyroscope
+    container_name: pyroscope
+    networks:
+      - vispyr
+    ports:
+      - 4040:4040
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib
+    container_name: collector
+    networks:
+      - vispyr
+    volumes:
+      - ./otelcol/otelcol.yaml:/etc/otelcol-contrib/config.yaml
+    ports:
+      - 13133:13133 # health_check extension
+      - 4317:4317 # OTLP gRPC receiver
+      - 4318:4318 # OTLP http receiver
+      - 55679:55679 # zpages extension
+    depends_on:
+    - tempo
+    - pyroscope
+    - prometheus
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    networks:
+      - vispyr
+    volumes:
+      - ./grafana/grafana.ini:/etc/grafana/grafana.ini
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    ports:
+      - 3000:3000
+    depends_on:
+      - prometheus
+      - tempo
+      - pyroscope
+      - otel-collector
