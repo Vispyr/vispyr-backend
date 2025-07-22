@@ -1,6 +1,5 @@
 networks:
   vispyr:
-    external: true
 
 services:
   init:
