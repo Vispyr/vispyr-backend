@@ -3,10 +3,6 @@
 
 extensions:
   health_check:
-  pprof:
-    endpoint: 0.0.0.0:1777
-  zpages:
-    endpoint: 0.0.0.0:55679
 
 receivers:
   otlp:
@@ -16,14 +12,13 @@ receivers:
       http:
         endpoint: 0.0.0.0:4318
 
-  # Collect own metrics
-  prometheus:
+  prometheus/nodemetrics:
     config:
       scrape_configs:
-      - job_name: 'otel-collector'
-        scrape_interval: 10s
+      - job_name: 'node'
+        scrape_interval: 15s
         static_configs:
-        - targets: ['0.0.0.0:8888']
+            - targets: ['host.docker.internal:9100']
 
 processors:
   batch:
@@ -36,7 +31,7 @@ exporters:
   debug:
     verbosity: detailed
   prometheus:
-    endpoint: collector:8889
+    endpoint: collector:9101
   otlp/tempo:
     endpoint: tempo:4317
     tls:
@@ -52,8 +47,8 @@ service:
       exporters: [otlp/tempo]
 
     metrics:
-      receivers: [otlp]
+      receivers: [prometheus/nodemetrics]
       processors: [batch]
       exporters: [prometheus]
 
-  extensions: [health_check, pprof, zpages]
+  extensions: [health_check]
