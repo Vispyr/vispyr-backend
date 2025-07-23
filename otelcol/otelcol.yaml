@@ -18,7 +18,7 @@ receivers:
       - job_name: 'node'
         scrape_interval: 15s
         static_configs:
-            - targets: ['host.docker.internal:9100']
+          - targets: ['host.docker.internal:9100']
 
 processors:
   batch:

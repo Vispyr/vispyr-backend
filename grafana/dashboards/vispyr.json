@@ -74,6 +74,142 @@
   "panels": [
     {
       "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.0.2",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.99, rate(http_client_request_duration_seconds_bucket[5m]))",
+          "legendFormat": "P99",
+          "range": true,
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          }
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.95, rate(http_client_request_duration_seconds_bucket[5m]))",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "P95",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.90, rate(http_client_request_duration_seconds_bucket[5m]))",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "P90",
+          "range": true,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.50, rate(http_client_request_duration_seconds_bucket[5m]))",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "P50",
+          "range": true,
+          "refId": "D"
+        }
+      ],
+      "title": "Latency",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
         "type": "datasource",
         "uid": "-- Mixed --"
       },
@@ -130,13 +266,38 @@
           },
           "unit": "percent"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "__systemRef": "hideSeriesFrom",
+            "matcher": {
+              "id": "byNames",
+              "options": {
+                "mode": "exclude",
+                "names": [
+                  "Average CPU Utilization Across All Logical Cores"
+                ],
+                "prefix": "All except:",
+                "readOnly": true
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 0
+        "y": 9
       },
       "id": 1,
       "options": {
@@ -161,17 +322,16 @@
           },
           "disableTextWrap": false,
           "editorMode": "code",
-          "exemplar": false,
-          "expr": "sum(system_cpu_utilization{system_cpu_state!=\"idle\"}) * 100",
+          "expr": "100 - (avg(rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
-          "legendFormat": "CPU Utilization (%)",
+          "legendFormat": "Average CPU Utilization Across All Logical Cores",
           "range": true,
           "refId": "A",
           "useBackend": false
         }
       ],
-      "title": "Total Active CPU Usage",
+      "title": "CPU",
       "transparent": true,
       "type": "timeseries"
     },
@@ -231,7 +391,7 @@
               }
             ]
           },
-          "unit": "bytes"
+          "unit": "percent"
         },
         "overrides": []
       },
@@ -239,7 +399,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 0
+        "y": 9
       },
       "id": 2,
       "options": {
@@ -264,16 +424,16 @@
           },
           "disableTextWrap": false,
           "editorMode": "code",
-          "expr": "sum(system_memory_usage{system_memory_state=\"used\"})",
+          "expr": "100 * (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
-          "legendFormat": "Used RAM (bytes)",
+          "legendFormat": "System Memory Not Immediately Available Without Impact On Performance",
           "range": true,
           "refId": "A",
           "useBackend": false
         }
       ],
-      "title": "System Memory Usage",
+      "title": "Memory",
       "transparent": true,
       "type": "timeseries"
     },
@@ -283,10 +443,10 @@
         "uid": "${DS_PYROSCOPE}"
       },
       "gridPos": {
-        "h": 16,
+        "h": 8,
         "w": 24,
         "x": 0,
-        "y": 8
+        "y": 17
       },
       "id": 3,
       "pluginVersion": "12.0.2",
@@ -304,7 +464,7 @@
           "spanSelector": []
         }
       ],
-      "title": "New panel",
+      "title": "Profile",
       "transparent": true,
       "type": "flamegraph"
     }
@@ -333,7 +493,7 @@
         "options": [],
         "query": "grafana-pyroscope-datasource",
         "refresh": 1,
-        "regex": "Grafana Pyroscope",
+        "regex": "Pyroscope",
         "type": "datasource"
       }
     ]
@@ -344,8 +504,8 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "HostMetrics Metrics to Profiles 3",
-  "uid": "765f5ba5-758a-474f-a6f3-c1f2b1c2c45f3",
+  "title": "Week 2 - Solution",
+  "uid": "cfada5db-2417-484b-82de-668b33c8ed25",
   "version": 1,
   "weekStart": ""
 }
