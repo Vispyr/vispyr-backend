@@ -47,7 +47,7 @@ service:
       exporters: [otlp/tempo]
 
     metrics:
-      receivers: [prometheus/nodemetrics]
+      receivers: [prometheus/nodemetrics, otlp]
       processors: [batch]
       exporters: [prometheus]
 
