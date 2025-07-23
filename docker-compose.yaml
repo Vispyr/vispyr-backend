@@ -40,6 +40,10 @@ services:
   pyroscope:
     image: grafana/pyroscope
     container_name: pyroscope
+    volumes:
+      - ./pyroscope/pyro-config.yaml:/etc/pyro-config.yaml
+    command:
+      - -config.file=/etc/pyro-config.yaml
     networks:
       - vispyr
     ports:
