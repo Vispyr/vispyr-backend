@@ -493,7 +493,7 @@
         "options": [],
         "query": "grafana-pyroscope-datasource",
         "refresh": 1,
-        "regex": "Pyroscope",
+        "regex": "Grafana Pyroscope",
         "type": "datasource"
       }
     ]
