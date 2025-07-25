@@ -36,6 +36,9 @@ services:
       - ./prometheus/prom-config.yaml:/etc/prometheus/prometheus.yml
     ports:
       - 9090:9090
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --web.enable-remote-write-receiver
 
   pyroscope:
     image: grafana/pyroscope
@@ -67,6 +70,21 @@ services:
     - tempo
     - pyroscope
     - prometheus
+
+  alloy:
+    image: grafana/alloy
+    container_name: alloy
+    networks:
+      - vispyr
+    volumes:
+      - ./alloy/config.alloy:/etc/alloy/config.alloy
+    ports:
+      - 12345:12345
+      - 9999:9999
+    command:
+      - run
+      - /etc/alloy/config.alloy
+      - --server.http.listen-addr=0.0.0.0:12345
 
   grafana:
     image: grafana/grafana

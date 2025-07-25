@@ -36,6 +36,8 @@ exporters:
     endpoint: tempo:4317
     tls:
       insecure: true
+  otlp/gateway:
+    endpoint: alloy:4317
 
 service:
 
@@ -44,11 +46,11 @@ service:
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/tempo]
+      exporters: [otlp/gateway]
 
     metrics:
       receivers: [prometheus/nodemetrics, otlp]
       processors: [batch]
-      exporters: [prometheus]
+      exporters: [otlp/gateway]
 
   extensions: [health_check]
