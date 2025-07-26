@@ -30,14 +30,16 @@ processors:
 exporters:
   debug:
     verbosity: detailed
-  prometheus:
-    endpoint: collector:9101
-  otlp/tempo:
-    endpoint: tempo:4317
+  # prometheus:
+  #   endpoint: collector:9101
+  # otlp/tempo:
+  #   endpoint: tempo:4317
+  #   tls:
+  #     insecure: true
+  otlp/gateway:
+    endpoint: gateway-collector:4317
     tls:
       insecure: true
-  otlp/gateway:
-    endpoint: alloy:4317
 
 service:
 
