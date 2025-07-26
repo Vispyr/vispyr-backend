@@ -9,8 +9,8 @@
       "pluginName": "Prometheus"
     },
     {
-      "name": "DS_PYROSCOPE",
-      "label": "Pyroscope",
+      "name": "DS_GRAFANA_PYROSCOPE",
+      "label": "Grafana Pyroscope",
       "description": "",
       "type": "datasource",
       "pluginId": "grafana-pyroscope-datasource",
@@ -155,15 +155,15 @@
       "pluginVersion": "12.0.2",
       "targets": [
         {
-          "editorMode": "code",
-          "expr": "histogram_quantile(0.99, rate(http_client_request_duration_seconds_bucket[5m]))",
-          "legendFormat": "P99",
-          "range": true,
-          "refId": "A",
           "datasource": {
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
-          }
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.99, rate(http_client_request_duration_seconds_bucket[5m]))",
+          "legendFormat": "P99 - {{exported_job}}",
+          "range": true,
+          "refId": "A"
         },
         {
           "datasource": {
@@ -174,7 +174,7 @@
           "expr": "histogram_quantile(0.95, rate(http_client_request_duration_seconds_bucket[5m]))",
           "hide": false,
           "instant": false,
-          "legendFormat": "P95",
+          "legendFormat": "P95 - {{exported_job}}",
           "range": true,
           "refId": "B"
         },
@@ -187,7 +187,7 @@
           "expr": "histogram_quantile(0.90, rate(http_client_request_duration_seconds_bucket[5m]))",
           "hide": false,
           "instant": false,
-          "legendFormat": "P90",
+          "legendFormat": "P90 - {{exported_job}}",
           "range": true,
           "refId": "C"
         },
@@ -200,12 +200,28 @@
           "expr": "histogram_quantile(0.50, rate(http_client_request_duration_seconds_bucket[5m]))",
           "hide": false,
           "instant": false,
-          "legendFormat": "P50",
+          "legendFormat": "P50 - {{exported_job}}",
           "range": true,
           "refId": "D"
         }
       ],
       "title": "Latency",
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "/internal_server/internal_server/",
+            "renamePattern": "Service 1"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "/main_server/main_server/",
+            "renamePattern": "TestApp Backend"
+          }
+        }
+      ],
       "type": "timeseries"
     },
     {
@@ -440,7 +456,7 @@
     {
       "datasource": {
         "type": "grafana-pyroscope-datasource",
-        "uid": "${DS_PYROSCOPE}"
+        "uid": "${DS_GRAFANA_PYROSCOPE}"
       },
       "gridPos": {
         "h": 8,
@@ -504,8 +520,8 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "Week 2 - Solution",
-  "uid": "cfada5db-2417-484b-82de-668b33c8ed25",
-  "version": 1,
+  "title": "Dynamic Service Labels for Latency",
+  "uid": "cfada5db-2417-484b-82de-668b33c8ed26",
+  "version": 2,
   "weekStart": ""
 }
