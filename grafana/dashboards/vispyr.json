@@ -18,6 +18,12 @@
       "version": "12.0.2"
     },
     {
+      "type": "panel",
+      "id": "table",
+      "name": "Table",
+      "version": ""
+    },
+    {
       "type": "datasource",
       "id": "tempo",
       "name": "Tempo",
@@ -154,7 +160,7 @@
           },
           "limit": 200,
           "metricsQueryType": "range",
-          "query": "{}",
+          "query": "{} | count() > 1",
           "queryType": "traceql",
           "refId": "A",
           "tableType": "traces"
@@ -164,12 +170,82 @@
       "type": "timeseries"
     },
     {
+      "datasource": {
+        "type": "tempo",
+        "uid": "${DS_TEMPO}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 9
+      },
+      "id": 6,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.0.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "tempo",
+            "uid": "${DS_TEMPO}"
+          },
+          "limit": 20,
+          "metricsQueryType": "range",
+          "query": "{} | count() > 1",
+          "queryType": "traceql",
+          "refId": "A",
+          "tableType": "traces"
+        }
+      ],
+      "title": "Traces Table",
+      "type": "table"
+    },
+    {
       "collapsed": true,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 9
+        "y": 18
       },
       "id": 4,
       "panels": [
@@ -226,7 +302,7 @@
       "type": "row"
     }
   ],
-  "refresh": "10s",
+  "refresh": "5s",
   "schemaVersion": 41,
   "tags": [],
   "templating": {
@@ -243,8 +319,8 @@
       },
       {
         "current": {
-          "text": "8df3bfe0959d8b363318be5627e3bb02",
-          "value": "8df3bfe0959d8b363318be5627e3bb02"
+          "text": "",
+          "value": ""
         },
         "label": "Trace ID",
         "name": "traceId",
@@ -255,13 +331,13 @@
     ]
   },
   "time": {
-    "from": "now-15m",
+    "from": "now-5m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "Home Page Drop Down Traces 4",
-  "uid": "04c2e6ae-7efb-4a81-b829-a51e43604c4f",
+  "title": "Home Page Drop Down Traces 5",
+  "uid": "7aae4969-92b6-4a2b-bb20-6dcf8dba9cec",
   "version": 1,
   "weekStart": ""
 }
