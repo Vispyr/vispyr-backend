@@ -10,3 +10,7 @@ datasources:
   - name: Grafana Pyroscope
     type: grafana-pyroscope-datasource
     url: http://pyroscope:4040
+
+  - name: Tempo
+    type: tempo
+    url: http://tempo:3200

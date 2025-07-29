@@ -10,11 +10,19 @@
     },
     {
       "name": "DS_PYROSCOPE",
-      "label": "Pyroscope",
+      "label": "Grafana Pyroscope",
       "description": "",
       "type": "datasource",
       "pluginId": "grafana-pyroscope-datasource",
       "pluginName": "Grafana Pyroscope"
+    },
+    {
+      "name": "DS_TEMPO",
+      "label": "Tempo",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "tempo",
+      "pluginName": "Tempo"
     }
   ],
   "__elements": {},
@@ -45,8 +53,26 @@
     },
     {
       "type": "panel",
+      "id": "table",
+      "name": "Table",
+      "version": ""
+    },
+    {
+      "type": "datasource",
+      "id": "tempo",
+      "name": "Tempo",
+      "version": "12.0.2"
+    },
+    {
+      "type": "panel",
       "id": "timeseries",
       "name": "Time series",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "traces",
+      "name": "Traces",
       "version": ""
     }
   ],
@@ -133,12 +159,12 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 9,
+        "h": 7,
         "w": 24,
         "x": 0,
         "y": 0
       },
-      "id": 4,
+      "id": 9,
       "options": {
         "legend": {
           "calcs": [],
@@ -155,15 +181,15 @@
       "pluginVersion": "12.0.2",
       "targets": [
         {
-          "editorMode": "code",
-          "expr": "histogram_quantile(0.99, rate(http_client_request_duration_seconds_bucket[5m]))",
-          "legendFormat": "P99",
-          "range": true,
-          "refId": "A",
           "datasource": {
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
-          }
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.99, rate(http_client_request_duration_seconds_bucket[5m]))",
+          "legendFormat": "P99 - {{exported_job}}",
+          "range": true,
+          "refId": "A"
         },
         {
           "datasource": {
@@ -174,7 +200,7 @@
           "expr": "histogram_quantile(0.95, rate(http_client_request_duration_seconds_bucket[5m]))",
           "hide": false,
           "instant": false,
-          "legendFormat": "P95",
+          "legendFormat": "P95 - {{exported_job}}",
           "range": true,
           "refId": "B"
         },
@@ -187,7 +213,7 @@
           "expr": "histogram_quantile(0.90, rate(http_client_request_duration_seconds_bucket[5m]))",
           "hide": false,
           "instant": false,
-          "legendFormat": "P90",
+          "legendFormat": "P90 - {{exported_job}}",
           "range": true,
           "refId": "C"
         },
@@ -200,12 +226,28 @@
           "expr": "histogram_quantile(0.50, rate(http_client_request_duration_seconds_bucket[5m]))",
           "hide": false,
           "instant": false,
-          "legendFormat": "P50",
+          "legendFormat": "P50 - {{exported_job}}",
           "range": true,
           "refId": "D"
         }
       ],
       "title": "Latency",
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "/internal_server/internal_server/",
+            "renamePattern": "Service 1"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "/main_server/main_server/",
+            "renamePattern": "TestApp Backend"
+          }
+        }
+      ],
       "type": "timeseries"
     },
     {
@@ -297,9 +339,9 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 9
+        "y": 7
       },
-      "id": 1,
+      "id": 7,
       "options": {
         "legend": {
           "calcs": [],
@@ -399,9 +441,9 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 9
+        "y": 7
       },
-      "id": 2,
+      "id": 8,
       "options": {
         "legend": {
           "calcs": [],
@@ -446,9 +488,9 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 17
+        "y": 15
       },
-      "id": 3,
+      "id": 6,
       "pluginVersion": "12.0.2",
       "targets": [
         {
@@ -467,6 +509,249 @@
       "title": "Profile",
       "transparent": true,
       "type": "flamegraph"
+    },
+    {
+      "datasource": {
+        "type": "tempo",
+        "uid": "${DS_TEMPO}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 0,
+            "pointSize": 15,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "displayName": "Requests",
+          "links": [
+            {
+              "oneClick": true,
+              "title": "Trace Waterfall",
+              "url": "?var-traceId=${__data.fields[\"traceID\"]}"
+            }
+          ],
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 23
+      },
+      "id": 5,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.0.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "tempo",
+            "uid": "${DS_TEMPO}"
+          },
+          "limit": 200,
+          "metricsQueryType": "range",
+          "query": "{} | count() > 1",
+          "queryType": "traceql",
+          "refId": "A",
+          "tableType": "traces"
+        }
+      ],
+      "title": "Duration",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "tempo",
+        "uid": "${DS_TEMPO}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "links": [
+            {
+              "title": "Trace Waterfall",
+              "url": "?var-traceId=${__data.fields[\"traceID\"]}"
+            }
+          ],
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 31
+      },
+      "id": 4,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.0.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "tempo",
+            "uid": "${DS_TEMPO}"
+          },
+          "limit": 20,
+          "metricsQueryType": "range",
+          "query": "{} | count() > 1",
+          "queryType": "traceql",
+          "refId": "A",
+          "tableType": "traces"
+        }
+      ],
+      "title": "Traces Table",
+      "type": "table"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 38
+      },
+      "id": 2,
+      "panels": [
+        {
+          "datasource": {
+            "type": "tempo",
+            "uid": "${DS_TEMPO}"
+          },
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 1
+          },
+          "id": 3,
+          "options": {
+            "spanFilters": {
+              "criticalPathOnly": false,
+              "matchesOnly": false,
+              "serviceNameOperator": "=",
+              "spanNameOperator": "=",
+              "tags": [
+                {
+                  "id": "4566329a-ec5",
+                  "operator": "="
+                }
+              ]
+            }
+          },
+          "pluginVersion": "12.0.2",
+          "targets": [
+            {
+              "datasource": {
+                "type": "tempo",
+                "uid": "${DS_TEMPO}"
+              },
+              "limit": 20,
+              "metricsQueryType": "range",
+              "query": "${traceId}",
+              "queryType": "traceql",
+              "refId": "A",
+              "tableType": "traces"
+            }
+          ],
+          "title": "Trace Details",
+          "type": "traces"
+        }
+      ],
+      "title": "Trace Waterfall",
+      "type": "row"
     }
   ],
   "refresh": "5s",
@@ -477,7 +762,7 @@
       {
         "current": {},
         "description": "Variable used to look up provisioned Prometheus Data Source",
-        "hide": 2,
+        "label": "Prometheus",
         "name": "DS_PROMETHEUS",
         "options": [],
         "query": "prometheus",
@@ -488,13 +773,34 @@
       {
         "current": {},
         "description": "Variable to look up provisioned Pyroscope Data Source",
-        "hide": 2,
+        "label": "Pyroscope",
         "name": "DS_PYROSCOPE",
         "options": [],
         "query": "grafana-pyroscope-datasource",
         "refresh": 1,
         "regex": "Grafana Pyroscope",
         "type": "datasource"
+      },
+      {
+        "current": {},
+        "label": "Tempo",
+        "name": "DS_TEMPO",
+        "options": [],
+        "query": "tempo",
+        "refresh": 1,
+        "regex": "",
+        "type": "datasource"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "label": "Trace ID",
+        "name": "traceId",
+        "options": [],
+        "query": "",
+        "type": "custom"
       }
     ]
   },
@@ -504,8 +810,8 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "Week 2 - Solution",
-  "uid": "cfada5db-2417-484b-82de-668b33c8ed25",
-  "version": 1,
+  "title": "All Panels 3",
+  "uid": "b099529b-d0ad-4a51-9100-88e68f4d956f",
+  "version": 2,
   "weekStart": ""
 }
