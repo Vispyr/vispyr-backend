@@ -30,10 +30,14 @@ processors:
 exporters:
   debug:
     verbosity: detailed
-  prometheus:
-    endpoint: collector:9101
-  otlp/tempo:
-    endpoint: tempo:4317
+  # prometheus:
+  #   endpoint: collector:9101
+  # otlp/tempo:
+  #   endpoint: tempo:4317
+  #   tls:
+  #     insecure: true
+  otlp/gateway:
+    endpoint: gateway-collector:4317
     tls:
       insecure: true
 
@@ -44,11 +48,11 @@ service:
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/tempo]
+      exporters: [otlp/gateway]
 
     metrics:
       receivers: [prometheus/nodemetrics, otlp]
       processors: [batch]
-      exporters: [prometheus]
+      exporters: [otlp/gateway]
 
   extensions: [health_check]

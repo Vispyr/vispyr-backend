@@ -26,7 +26,6 @@ services:
     depends_on:
       - init
 
-
   prometheus:
     image: prom/prometheus
     container_name: prometheus
@@ -36,6 +35,9 @@ services:
       - ./prometheus/prom-config.yaml:/etc/prometheus/prometheus.yml
     ports:
       - 9090:9090
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --web.enable-remote-write-receiver
 
   pyroscope:
     image: grafana/pyroscope
@@ -49,20 +51,60 @@ services:
     ports:
       - 4040:4040
 
-  otel-collector:
-    image: otel/opentelemetry-collector-contrib
-    container_name: collector
+  agent-collector:
+    image: grafana/alloy
+    container_name: agent-collector
     networks:
       - vispyr
     volumes:
-      - ./otelcol/otelcol.yaml:/etc/otelcol-contrib/config.yaml
+      - ./alloy/agent-config.alloy:/etc/alloy/config.alloy
     ports:
-      - 13133:13133 # health_check extension
       - 4317:4317 # OTLP gRPC receiver
       - 4318:4318 # OTLP http receiver
-      - 55679:55679 # zpages extension
+      - 9999:9999 # Pyroscope listen server
+      - 12346:12346 # Debug UI
+    command:
+      - run
+      - /etc/alloy/config.alloy
+      - --server.http.listen-addr=0.0.0.0:12346
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    depends_on:
+      - gateway-collector
+
+ 
+  # agent-collector:
+  #   image: otel/opentelemetry-collector-contrib
+  #   container_name: agent-collector
+  #   networks:
+  #     - vispyr
+  #   volumes:
+  #     - ./otelcol/otelcol.yaml:/etc/otelcol-contrib/config.yaml
+  #   ports:
+  #     - 13133:13133 # health_check extension
+  #     - 4317:4317 # OTLP gRPC receiver
+  #     - 4318:4318 # OTLP http receiver
+  #     - 55679:55679 # zpages extension
+  #   extra_hosts:
+  #     - "host.docker.internal:host-gateway"
+  #   depends_on:
+  #   - tempo
+  #   - pyroscope
+  #   - prometheus
+
+  gateway-collector:
+    image: grafana/alloy
+    container_name: gateway-collector
+    networks:
+      - vispyr
+    volumes:
+      - ./alloy/gateway-config.alloy:/etc/alloy/config.alloy
+    ports:
+      - 12345:12345
+    command:
+      - run
+      - /etc/alloy/config.alloy
+      - --server.http.listen-addr=0.0.0.0:12345
     depends_on:
     - tempo
     - pyroscope
@@ -83,4 +125,3 @@ services:
       - prometheus
       - tempo
       - pyroscope
-      - otel-collector
