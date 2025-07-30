@@ -33,8 +33,6 @@ services:
       - vispyr
     volumes:
       - ./prometheus/prom-config.yaml:/etc/prometheus/prometheus.yml
-    ports:
-      - 9090:9090
     command:
       - --config.file=/etc/prometheus/prometheus.yml
       - --web.enable-remote-write-receiver
@@ -51,28 +49,27 @@ services:
     ports:
       - 4040:4040
 
-  agent-collector:
-    image: grafana/alloy
-    container_name: agent-collector
-    networks:
-      - vispyr
-    volumes:
-      - ./alloy/agent-config.alloy:/etc/alloy/config.alloy
-    ports:
-      - 4317:4317 # OTLP gRPC receiver
-      - 4318:4318 # OTLP http receiver
-      - 9999:9999 # Pyroscope listen server
-      - 12346:12346 # Debug UI
-    command:
-      - run
-      - /etc/alloy/config.alloy
-      - --server.http.listen-addr=0.0.0.0:12346
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    depends_on:
-      - gateway-collector
+  # agent-collector:
+  #   image: grafana/alloy
+  #   container_name: agent-collector
+  #   networks:
+  #     - vispyr
+  #   volumes:
+  #     - ./alloy/agent-config.alloy:/etc/alloy/config.alloy
+  #   ports:
+  #     - 4317:4317 # OTLP gRPC receiver
+  #     - 4318:4318 # OTLP http receiver
+  #     - 9999:9999 # Pyroscope listen server
+  #     - 12346:12346 # Debug UI
+  #   command:
+  #     - run
+  #     - /etc/alloy/config.alloy
+  #     - --server.http.listen-addr=0.0.0.0:12346
+  #   extra_hosts:
+  #     - "host.docker.internal:host-gateway"
+  #   depends_on:
+  #     - gateway-collector
 
- 
   # agent-collector:
   #   image: otel/opentelemetry-collector-contrib
   #   container_name: agent-collector
@@ -100,7 +97,11 @@ services:
     volumes:
       - ./alloy/gateway-config.alloy:/etc/alloy/config.alloy
     ports:
-      - 12345:12345
+      - 4317:4317 # OTLP gRPC receiver
+      - 4318:4318 # OTLP http receiver
+      - 9090:9090 # Node metrics scraper http receiver
+      - 9999:9999 # Pyroscope http receiver
+      - 12345:12345 # Debug UI
     command:
       - run
       - /etc/alloy/config.alloy
