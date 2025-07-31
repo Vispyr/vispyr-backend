@@ -13,3 +13,15 @@ storage:
     backend: local
     local:
       path: /var/tempo
+
+metrics_generator:
+  registry:
+    external_labels:
+      source: tempo
+  traces_storage:
+    path: /var/tempo/generator/traces
+  storage:
+    path: /var/tempo/generator/wal
+
+overrides:
+  metrics_generator_processors: ['local-blocks']
