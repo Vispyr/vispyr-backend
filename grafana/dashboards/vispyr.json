@@ -9,7 +9,7 @@
       "pluginName": "Prometheus"
     },
     {
-      "name": "DS_GRAFANA_PYROSCOPE",
+      "name": "DS_PYROSCOPE",
       "label": "Pyroscope",
       "description": "",
       "type": "datasource",
@@ -467,7 +467,7 @@
         {
           "datasource": {
             "type": "grafana-pyroscope-datasource",
-            "uid": "${DS_GRAFANA_PYROSCOPE}"
+            "uid": "${DS_PYROSCOPE}"
           },
           "groupBy": [],
           "labelSelector": "{}",
@@ -778,53 +778,54 @@
         "y": 30
       },
       "id": 2,
-      "panels": [],
-      "title": "Trace Waterfall",
-      "type": "row"
-    },
-    {
-      "datasource": {
-        "type": "tempo",
-        "uid": "${DS_TEMPO}"
-      },
-      "gridPos": {
-        "h": 24,
-        "w": 24,
-        "x": 0,
-        "y": 31
-      },
-      "id": 3,
-      "options": {
-        "spanFilters": {
-          "criticalPathOnly": false,
-          "matchesOnly": false,
-          "serviceNameOperator": "=",
-          "spanNameOperator": "=",
-          "tags": [
-            {
-              "id": "4566329a-ec5",
-              "operator": "="
-            }
-          ]
-        }
-      },
-      "pluginVersion": "12.2.0-16636675413",
-      "targets": [
+      "panels": [
         {
           "datasource": {
             "type": "tempo",
             "uid": "${DS_TEMPO}"
           },
-          "limit": 20,
-          "metricsQueryType": "range",
-          "query": "${traceId}",
-          "queryType": "traceql",
-          "refId": "A",
-          "tableType": "traces"
+          "gridPos": {
+            "h": 24,
+            "w": 24,
+            "x": 0,
+            "y": 31
+          },
+          "id": 3,
+          "options": {
+            "spanFilters": {
+              "criticalPathOnly": false,
+              "matchesOnly": false,
+              "serviceNameOperator": "=",
+              "spanNameOperator": "=",
+              "tags": [
+                {
+                  "id": "4566329a-ec5",
+                  "operator": "="
+                }
+              ]
+            }
+          },
+          "pluginVersion": "12.2.0-16636675413",
+          "targets": [
+            {
+              "datasource": {
+                "type": "tempo",
+                "uid": "${DS_TEMPO}"
+              },
+              "limit": 20,
+              "metricsQueryType": "range",
+              "query": "${traceId}",
+              "queryType": "traceql",
+              "refId": "A",
+              "tableType": "traces"
+            }
+          ],
+          "title": "Trace Details",
+          "type": "traces"
         }
       ],
-      "title": "Trace Details",
-      "type": "traces"
+      "title": "Trace Waterfall",
+      "type": "row"
     }
   ],
   "refresh": "15s",
@@ -902,7 +903,7 @@
       {
         "current": {
           "text": null,
-          "value": null,
+          "value": null
         },
         "label": "Trace ID",
         "name": "traceId",
