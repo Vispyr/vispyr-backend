@@ -902,7 +902,7 @@
       {
         "current": {
           "text": null,
-          "value": null,
+          "value": null
         },
         "label": "Trace ID",
         "name": "traceId",
