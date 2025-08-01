@@ -639,7 +639,7 @@
           "tableType": "traces"
         }
       ],
-      "title": "Traces Table",
+      "title": "Trace Table",
       "transformations": [
         {
           "id": "organize",
@@ -770,7 +770,7 @@
       "type": "timeseries"
     },
     {
-      "collapsed": false,
+      "collapsed": true,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -901,8 +901,8 @@
       },
       {
         "current": {
-          "text": "401e3149a452aec2e0c1760d5f6d6c3",
-          "value": "401e3149a452aec2e0c1760d5f6d6c3"
+          "text": null,
+          "value": null,
         },
         "label": "Trace ID",
         "name": "traceId",
