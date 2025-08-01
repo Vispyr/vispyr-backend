@@ -55,7 +55,7 @@ services:
   #   networks:
   #     - vispyr
   #   volumes:
-  #     - ./alloy/agent-config.alloy:/etc/alloy/config.alloy
+  #     - ./alloy/agent-config-local.alloy:/etc/alloy/config.alloy
   #   ports:
   #     - 4317:4317 # OTLP gRPC receiver
   #     - 4318:4318 # OTLP http receiver
