@@ -9,7 +9,7 @@ otelcol.receiver.otlp "default" {
   }
 
   output {
-    traces = [otelcol.exporter.otlp.gateway_collector.input]
+    traces = [ otelcol.connector.spanmetrics.default.input, otelcol.exporter.otlp.gateway_collector.input]
     metrics = [otelcol.exporter.otlp.gateway_collector.input]
   }
 }
@@ -33,6 +33,26 @@ pyroscope.receive_http "profiles_sdk" {
 otelcol.processor.batch "sdk_telemetry" {
   output {
     traces = [otelcol.exporter.otlp.gateway_collector.input]
+    metrics = [otelcol.exporter.otlp.gateway_collector.input]
+  }
+}
+
+otelcol.connector.spanmetrics "default" {
+  dimension {
+    name = "http.method"
+    default = "GET"
+  }
+  dimension {
+    name = "http.target"
+  }
+  histogram {
+    explicit {
+      buckets = ["50ms", "100ms", "250ms", "1s", "5s", "10s"]
+    }
+  }
+  metrics_flush_interval = "15s"
+  namespace = "traces.spanmetrics"
+  output {
     metrics = [otelcol.exporter.otlp.gateway_collector.input]
   }
 }
