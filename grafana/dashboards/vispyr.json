@@ -639,7 +639,7 @@
           "tableType": "traces"
         }
       ],
-      "title": "Traces Table",
+      "title": "Trace Table",
       "transformations": [
         {
           "id": "organize",
