@@ -424,7 +424,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "topk(5, histogram_quantile(0.99, sum by(le, span_name) (traces_spanmetrics_duration_milliseconds_bucket{span_kind=\"SPAN_KIND_SERVER\", service_name=\"$app\", http_target=~\"$route\"})))",
+          "expr": "topk(5, histogram_quantile(0.99, sum(rate(traces_spanmetrics_duration_milliseconds_bucket{span_kind=\"SPAN_KIND_SERVER\", service_name=\"$app\", http_target=~\"$route\"}[5m])) by (le, span_name)))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
