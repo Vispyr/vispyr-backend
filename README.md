@@ -14,33 +14,33 @@ The main purpose of this entity is to ingest, store and present the telemetry da
 ## Architecture
 
 ```
-            ┌─────────────┐
-            │     App     │
-            │(Telemetry)  │
-            └─────────────┘
-                   │
-            ┌─────────────┐
-            │Grafana Alloy│
-            │ (Collector) │
-            └─────────────┘
-              /     |     \
-             /      |      \
-  ┌─────────────┐   |   ┌─────────────┐
-  │ Prometheus  │   |   │   Tempo     │
-  │ (Metrics)   │---|---│ (Traces)    │
-  └─────────────┘   |   └─────────────┘
-         │          |          │
-         │    ┌─────────────┐  │
-         │    │ Pyroscope   │  │
-         │    │(Profiling)  │  │
-         │    └─────────────┘  │
-         │          │          │
-         └──────────┼──────────┘
-                    │
-            ┌─────────────┐
-            │   Grafana   │
-            │ (Dashboard) │
-            └─────────────┘
+                    ┌─────────────┐
+                    │     App     │
+                    │(Telemetry)  │
+                    └─────────────┘
+                           │
+                    ┌─────────────┐
+                    │Grafana Alloy│
+                    │ (Collector) │
+                    └─────────────┘
+                      /     |     \
+                     /      |      \
+          ┌─────────────┐   |   ┌─────────────┐
+          │ Prometheus  │   |   │   Tempo     │
+          │ (Metrics)   │---|---│ (Traces)    │
+          └─────────────┘   |   └─────────────┘
+                 │          |          │
+                 │    ┌─────────────┐  │
+                 │    │ Pyroscope   │  │
+                 │    │(Profiling)  │  │
+                 │    └─────────────┘  │
+                 │          │          │
+                 └──────────┼──────────┘
+                            │
+                    ┌─────────────┐
+                    │   Grafana   │
+                    │ (Dashboard) │
+                    └─────────────┘
 ```
 
 ## Port Mapping
