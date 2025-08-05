@@ -47,13 +47,13 @@ The main purpose of this entity is to ingest, store and present the telemetry da
 
 | Service | Port | Purpose |
 |---------|------|---------|
-| Grafana | 3000 | Dashboard UI |
-| Tempo | 3200 | Tempo API |
-| Pyroscope | 4040 | Pyroscope UI |
 | Alloy | 4317 | OTLP gRPC |
 | Alloy | 9090 | Metrics scraping |
 | Alloy | 9999 | Pyroscope ingestion |
 | Alloy | 12345 | Debug UI |
+| Grafana | 3000 | Dashboard UI |
+| Pyroscope | 4040 | Pyroscope UI |
+| Tempo | 3200 | Tempo API |
 
 ## Local Deployment
 
