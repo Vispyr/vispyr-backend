@@ -1,7 +1,3 @@
-<div align="left">
-  <img width="225" height="263" alt="Logo" src="https://raw.githubusercontent.com/vispyr/.github/main/profile/assets/logo.png" />
-</div>
-
 # Vispyr Backend
 
 The main purpose of this entity is to ingest, store and present the telemetry data produced by the user's application with the Vispyr agent attached. Grafana Alloy - which itself wraps around OTel Collector - routes the flux of data from its ingestion point to each database. Prometheus, Tempo and Pyroscope store metrics, traces and profiling data, respectively. The `docker-compose.yml` file orchastrates the spinning up of all these services.
@@ -49,20 +45,78 @@ The main purpose of this entity is to ingest, store and present the telemetry da
 
 ## Port Mapping
 
-| Service | Port | Purpose |
-|---------|------|---------|
-| Alloy | 4317 | OTLP gRPC |
-| Alloy | 9090 | Metrics scraping |
-| Alloy | 9999 | Pyroscope ingestion |
-| Alloy | 12345 | Debug UI |
-| Grafana | 3000 | Dashboard UI |
-| Pyroscope | 4040 | Pyroscope UI |
-| Tempo | 3200 | Tempo API |
+| Service | Port |
+|---------|------|
+| Alloy | 4317 |
+| Alloy | 9090 |
+| Alloy | 9999 |
+| Alloy | 12345 |
+| Grafana | 3000 |
+| Pyroscope | 4040 |
+| Tempo | 3200 |
 
-## Local Deployment
+## Service Details
 
-The deployment of this stack is done automatically by [Vispyr's CLI](), but you can also deploy it locally by following these steps:
-* Clone this repository.
-* Make sure you have Docker daemon (`dockerd`) running.
-* Run `docker compose up`.
-* Send OTLP data in gRPC to `localhost:4317`.
+### Grafana Alloy (Gateway Collector)
+**Container:** `gateway-collector`  
+**Image:** `grafana/alloy`  
+**Purpose:** Central telemetry data collection and routing
+
+**Key Features:**
+- **OTLP Receivers:** Accepts telemetry data via gRPC (4317)
+- **Metrics Collection:** Node metrics scraping endpoint (9090)
+- **Profiling Gateway:** Pyroscope data ingestion (9999)
+- **Debug Interface:** Management UI available on port 12345
+
+**Configuration:** `./alloy/gateway-config.alloy`
+
+### Grafana
+**Container:** `grafana`  
+**Image:** `grafana/grafana`  
+**Purpose:** Unified observability dashboard and visualization
+
+**Features:**
+- Pre-configured dashboards for metrics, traces, and profiles
+- Data source integrations with Prometheus, Tempo, and Pyroscope
+- Custom dashboard provisioning
+
+**Configuration Files:**
+- `./grafana/grafana.ini` - Main Grafana configuration
+- `./grafana/dashboards/` - Dashboard definitions
+- `./grafana/provisioning/` - Data source and dashboard provisioning
+
+### Prometheus
+**Container:** `prometheus`  
+**Image:** `prom/prometheus`  
+**Purpose:** Metrics storage and querying engine
+
+**Features:**
+- Remote write receiver enabled for external metric ingestion
+- Time-series data storage and aggregation
+- PromQL query interface
+
+**Configuration:** `./prometheus/prom-config.yaml`
+
+### Tempo
+**Container:** `tempo`  
+**Image:** `grafana/tempo`  
+**Purpose:** Distributed tracing backend
+
+**Features:**
+- OTLP trace ingestion
+- Trace storage and querying
+- Distributed trace visualization support
+
+**Configuration:** `./tempo/tempo.yaml`  
+**Data Storage:** `./tempo/data`
+
+### Pyroscope
+**Container:** `pyroscope`  
+**Image:** `grafana/pyroscope`  
+**Purpose:** Continuous profiling platform
+
+**Features:**
+- Application performance profiling
+- Integration with NodeJS profile emitter app
+
+**Configuration:** `./pyroscope/pyro-config.yaml`
