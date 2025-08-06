@@ -2,7 +2,7 @@ networks:
   vispyr:
 
 services:
-  init:
+  init-tempo:
     image: &tempoImage grafana/tempo
     user: root
     entrypoint:
@@ -11,6 +11,16 @@ services:
       - "/var/tempo"
     volumes:
       - ./tempo/data:/var/tempo
+
+  init-prometheus:
+    image: &promImage prom/prometheus
+    user: root
+    entrypoint:
+      - "chown"
+      - "65534:65534"
+      - "/prometheus"
+    volumes:
+      - ./prometheus/data:/prometheus
 
   tempo:
     image: *tempoImage
@@ -24,18 +34,21 @@ services:
     ports:
       - "3200:3200" # tempo
     depends_on:
-      - init
+      - init-tempo
 
   prometheus:
-    image: prom/prometheus
+    image: *promImage
     container_name: prometheus
     networks:
       - vispyr
     volumes:
       - ./prometheus/prom-config.yaml:/etc/prometheus/prometheus.yml
+      - ./prometheus/data:/prometheus
     command:
       - --config.file=/etc/prometheus/prometheus.yml
       - --web.enable-remote-write-receiver
+    depends_on:
+      - init-prometheus
 
   pyroscope:
     image: grafana/pyroscope
