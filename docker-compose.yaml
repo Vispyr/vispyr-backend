@@ -43,7 +43,8 @@ services:
     volumes:
       - ./pyroscope/pyro-config.yaml:/etc/pyro-config.yaml
     command:
-      - -config.file=/etc/pyro-config.yaml
+      - --config.file=/etc/pyro-config.yaml
+      - --storage.tsdb.retention.time=30d
     networks:
       - vispyr
     ports:
