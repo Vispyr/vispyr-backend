@@ -120,3 +120,8 @@ The main purpose of this entity is to ingest, store and present the telemetry da
 - Integration with NodeJS profile emitter app
 
 **Configuration:** `./pyroscope/pyro-config.yaml`
+
+# Learn more
+
+For a more detailed and comprehensive description of Vispyr, along the motivation for its creation, please read our [case study](https://vispyr.com "Go to Case Study").
+
