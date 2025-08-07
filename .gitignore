@@ -1,6 +1,3 @@
-old_compose_configs
-old_compose_configs/*
 tempo/data
 prometheus/data
-grafana/data/dashboards/
-grafana/data/*
+grafana/data
