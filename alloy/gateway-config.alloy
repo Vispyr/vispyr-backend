@@ -1,11 +1,6 @@
-// Receivers
 otelcol.receiver.otlp "agent_sdk_telemetry" {
   grpc {
     endpoint = "0.0.0.0:4317"
-  }
-
-  http {
-    endpoint = "0.0.0.0:4318"
   }
 
   output {
@@ -32,7 +27,6 @@ pyroscope.receive_http "default" {
   forward_to = [pyroscope.write.default.receiver]
 }
 
-// OTel Processor
 otelcol.processor.batch "sdk_telemetry" {
   output {
     metrics = [otelcol.exporter.prometheus.default.input]
@@ -40,20 +34,16 @@ otelcol.processor.batch "sdk_telemetry" {
   }
 }
 
-// Alloy otel to prometheus converter
-// This component is not the OTel exporter, but instead converts data to prom format
 otelcol.exporter.prometheus "default" {
   forward_to = [prometheus.remote_write.default.receiver]
 }
 
-// Promtheus exporter / writer
 prometheus.remote_write "default" {
   endpoint {
     url = "http://prometheus:9090/api/v1/write"
   }
 }
 
-// Tempo exporter
 otelcol.exporter.otlp "tempo" {
   client {
     endpoint = "http://tempo:4317"
@@ -64,7 +54,6 @@ otelcol.exporter.otlp "tempo" {
   }
 }
 
-// Pyroscope writer
 pyroscope.write "default" {
   endpoint {
     url = "http://pyroscope:4040"
