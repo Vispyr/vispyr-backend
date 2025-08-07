@@ -94,7 +94,7 @@ Prometheus receives metrics that's being pushed via its default remote write end
 
 ### Tempo
 
-Tempo receives OTLP traces from Alloy via gRPC on port 4317 and generates metrics from these traces by the enabling its `metrics_genetor` feature. An S3 bucket is used for object retention of 30 days. Tempo spins up an HTTP server on port 3200 that is used by Grafana to query traces.
+Tempo receives OTLP traces from Alloy via gRPC on port 4317 and generates metrics from these traces by the enabling of its `metrics_genetor` feature. An S3 bucket is used for object retention of 30 days. Tempo spins up an HTTP server on port 3200 that is used by Grafana to query traces.
 
 ```
 Applications ──► Alloy ──► Tempo ──────► S3 Storage
@@ -106,30 +106,12 @@ Applications ──► Alloy ──► Tempo ──────► S3 Storage
 ```
 
 ### Pyroscope
-**Container:** `pyroscope`  
-**Image:** `grafana/pyroscope`  
-**Purpose:** Continuous profiling platform
 
-**Features:**
-- Application performance profiling
-- Integration with NodeJS profile emitter app
-
-**Configuration:** `./pyroscope/pyro-config.yaml`
+Similar to Prometheus, Pyroscope is not configured much beyond its default options: local filesystem storage, HTTP server on port 4040, retention period of 30 days and default API routes. The only overriding configuration is so that Pyroscope won't profile itself. 
 
 ### Grafana
-**Container:** `grafana`  
-**Image:** `grafana/grafana`  
-**Purpose:** Unified observability dashboard and visualization
 
-**Features:**
-- Pre-configured dashboards for metrics, traces, and profiles
-- Data source integrations with Prometheus, Tempo, and Pyroscope
-- Custom dashboard provisioning
-
-**Configuration Files:**
-- `./grafana/grafana.ini` - Main Grafana configuration
-- `./grafana/dashboards/` - Dashboard definitions
-- `./grafana/provisioning/` - Data source and dashboard provisioning
+Grafana is provisioned with Vispyr's dashboard in its homepage. To build each panel from this dashboard, the above databases are queried in their respective language: PromQL for Prometheus, TraceQL for Tempo and FlameQL for Pyroscope.
 
 # Learn more
 
