@@ -58,17 +58,35 @@ The main purpose of this entity is to ingest, store and present the telemetry da
 ## Service Details
 
 ### Grafana Alloy (Gateway Collector)
-**Container:** `gateway-collector`  
-**Image:** `grafana/alloy`  
-**Purpose:** Central telemetry data collection and routing
 
-**Key Features:**
-- **OTLP Receivers:** Accepts telemetry data via gRPC (4317)
-- **Metrics Collection:** Node metrics scraping endpoint (9090)
-- **Profiling Gateway:** Pyroscope data ingestion (9999)
-- **Debug Interface:** Management UI available on port 12345
+It's the front-door of the observability pipeline receiving telemetry data from all distributed applications that were instrumented via the Vispyr agent. It batches the metrics and traces sent through NodeJS instrumentation and further processes these metrics into Prometheus format. There are 3 flows of telemetry data passing through it:
 
-**Configuration:** `./alloy/gateway-config.alloy`
+
+```
+FLOW 1: OpenTelemetry
+┌─────────────────┐    OTLP     ┌───────────┐    Batch    ┌──────────────────┐
+│ OpenTelemetry   │ ──────────► │   Alloy   │ ──────────► │   OTLP to        │
+│ SDKs            │  gRPC:4317  │           │             │     OpenMetrics  │
+│ (Node.js)       │  HTTP:4318  │           │             │  ┌─────────────┐ │
+└─────────────────┘             └───────────┘             │  │ Metrics ────┼─┼──► Prometheus
+                                                          └──│─────────────│─┘    :9090/write
+                                                             │ Traces ─────┼───► Tempo
+                                                             │             │     :4317 OTLP
+                                                             └─────────────┘ 
+
+FLOW 2: Prometheus
+┌─────────────────┐   HTTP:9090  ┌───────────┐ remote_write ┌──────────────┐
+│ Prometheus      │ ──────────►  │   Alloy   │ ───────────► │ Prometheus   │
+│ Node Exporter   │   (push)     │           │              │ :9090/write  │
+└─────────────────┘              └───────────┘              └──────────────┘
+
+FLOW 3: Pyroscope
+┌─────────────────┐   HTTP:9999  ┌───────────┐   forward    ┌──────────────┐
+│ Pyroscope       │ ──────────►  │   Alloy   │ ───────────► │ Pyroscope    │
+│ SDK             │   (profiles) │           │              │ :4040        │
+└─────────────────┘              └───────────┘              └──────────────┘
+
+```
 
 ### Grafana
 **Container:** `grafana`  
