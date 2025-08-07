@@ -67,7 +67,7 @@ FLOW 1: OpenTelemetry
 ┌─────────────────┐    OTLP     ┌───────────┐    Batch    ┌──────────────────┐
 │ OpenTelemetry   │ ──────────► │   Alloy   │ ──────────► │   OTLP to        │
 │ SDKs            │  gRPC:4317  │           │             │     OpenMetrics  │
-│ (Node.js)       │  HTTP:4318  │           │             │  ┌─────────────┐ │
+│ (Node.js)       │             │           │             │  ┌─────────────┐ │
 └─────────────────┘             └───────────┘             │  │ Metrics ────┼─┼──► Prometheus
                                                           └──│─────────────│─┘    :9090/write
                                                              │ Traces ─────┼───► Tempo
