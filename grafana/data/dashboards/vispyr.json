@@ -709,7 +709,7 @@
           "displayName": "Requests",
           "links": [
             {
-              "oneClick": true,
+              "oneClick": false,
               "title": "Trace Waterfall",
               "url": "?var-traceId=${__data.fields[\"traceID\"]}"
             }
