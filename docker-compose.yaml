@@ -127,12 +127,13 @@ services:
 
   grafana:
     image: grafana/grafana
+    user: "1000:1000"
     container_name: grafana
     networks:
       - vispyr
     volumes:
+      - ./grafana/data:/var/lib/grafana
       - ./grafana/grafana.ini:/etc/grafana/grafana.ini
-      - ./grafana/dashboards:/var/lib/grafana/dashboards
       - ./grafana/provisioning:/etc/grafana/provisioning
     ports:
       - 3000:3000
