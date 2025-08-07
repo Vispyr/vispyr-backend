@@ -10,18 +10,20 @@ distributor:
 
 storage:
   trace:
-    backend: local
-    local:
-      path: /var/tempo
+    backend: s3
+    s3:
+      endpoint: ${TEMPO_S3_ENDPOINT}
+      bucket: ${TEMPO_S3_BUCKET}
+      forcepathstyle: true
+    wal:
+      path: /var/tempo/wal
+      v2_encoding: snappy
 
-metrics_generator:
-  registry:
-    external_labels:
-      source: tempo
-  traces_storage:
-    path: /var/tempo/generator/traces
-  storage:
-    path: /var/tempo/generator/wal
+compactor:
+  compaction:
+    block_retention: 720h
 
 overrides:
-  metrics_generator_processors: ['local-blocks']
+   defaults:
+     metrics_generator:
+       processors: [local-blocks]
