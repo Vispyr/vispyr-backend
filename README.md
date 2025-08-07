@@ -88,6 +88,34 @@ FLOW 3: Pyroscope
 
 ```
 
+### Prometheus
+
+Prometheus receives metrics that's being pushed via its default remote write endpoint: `/api/v1/write` on port 9090. It's acting purely as a passive storage TSDB, i.e. it doesn't scrape data from anywhere. Vispyr's custom PromQL queries in Grafana are used to build the dashboards from the data stored here.
+
+### Tempo
+
+Tempo receives OTLP traces from Alloy via gRPC on port 4317 and generates metrics from these traces by the enabling its `metrics_genetor` feature. An S3 bucket is used for object retention of 30 days. Tempo spins up an HTTP server on port 3200 that is used by Grafana to query traces.
+
+```
+Applications ──► Alloy ──► Tempo ──────► S3 Storage
+    (traces)      (OTLP)    │              (long-term)
+                            │
+                            ▼
+                    Generated Metrics ──► Prometheus
+                    (RED metrics)         (via remote_write)
+```
+
+### Pyroscope
+**Container:** `pyroscope`  
+**Image:** `grafana/pyroscope`  
+**Purpose:** Continuous profiling platform
+
+**Features:**
+- Application performance profiling
+- Integration with NodeJS profile emitter app
+
+**Configuration:** `./pyroscope/pyro-config.yaml`
+
 ### Grafana
 **Container:** `grafana`  
 **Image:** `grafana/grafana`  
@@ -102,42 +130,6 @@ FLOW 3: Pyroscope
 - `./grafana/grafana.ini` - Main Grafana configuration
 - `./grafana/dashboards/` - Dashboard definitions
 - `./grafana/provisioning/` - Data source and dashboard provisioning
-
-### Prometheus
-**Container:** `prometheus`  
-**Image:** `prom/prometheus`  
-**Purpose:** Metrics storage and querying engine
-
-**Features:**
-- Remote write receiver enabled for external metric ingestion
-- Time-series data storage and aggregation
-- PromQL query interface
-
-**Configuration:** `./prometheus/prom-config.yaml`
-
-### Tempo
-**Container:** `tempo`  
-**Image:** `grafana/tempo`  
-**Purpose:** Distributed tracing backend
-
-**Features:**
-- OTLP trace ingestion
-- Trace storage and querying
-- Distributed trace visualization support
-
-**Configuration:** `./tempo/tempo.yaml`  
-**Data Storage:** `./tempo/data`
-
-### Pyroscope
-**Container:** `pyroscope`  
-**Image:** `grafana/pyroscope`  
-**Purpose:** Continuous profiling platform
-
-**Features:**
-- Application performance profiling
-- Integration with NodeJS profile emitter app
-
-**Configuration:** `./pyroscope/pyro-config.yaml`
 
 # Learn more
 
