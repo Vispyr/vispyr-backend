@@ -4,7 +4,7 @@
   </a>
 </div>
 
-# Vispyr Backend
+# Backend
 
 The main purpose of this Vispyr's backend is to ingest, store and present the telemetry data produced by the user's application with the Vispyr agent attached. Grafana Alloy - which itself wraps around OTel Collector - routes the flux of data from its ingestion point to each database. Prometheus, Tempo and Pyroscope store metrics, traces and profiling data, respectively. The `docker-compose.yml` file orchastrates the spinning up of all these services.
 
