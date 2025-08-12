@@ -47,6 +47,7 @@ services:
     command:
       - --config.file=/etc/prometheus/prometheus.yml
       - --web.enable-remote-write-receiver
+      - --storage.tsdb.retention.time=30d
     depends_on:
       - init-prometheus
 
@@ -58,7 +59,6 @@ services:
       - ./pyroscope/data:/data
     command:
       - --config.file=/etc/pyro-config.yaml
-      - --storage.tsdb.retention.time=30d
     networks:
       - vispyr
     ports:
