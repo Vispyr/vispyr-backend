@@ -10,11 +10,24 @@ distributor:
 
 storage:
   trace:
-    backend: local
-    local:
-      path: /var/tempo
+    backend: s3
+    s3:
+      endpoint: ${TEMPO_S3_ENDPOINT}
+      bucket: ${TEMPO_S3_BUCKET}
+      forcepathstyle: true
+    wal:
+      path: /var/tempo/wal
+      v2_encoding: snappy
+
+compactor:
+  compaction:
+    block_retention: 720h
 
 metrics_generator:
+  processor:
+    local_blocks:
+      filter_server_spans: false
+      flush_to_storage: true
   registry:
     external_labels:
       source: tempo
@@ -22,6 +35,11 @@ metrics_generator:
     path: /var/tempo/generator/traces
   storage:
     path: /var/tempo/generator/wal
+    remote_write:
+      - url: http://prometheus:9090/api/v1/write
+        send_exemplars: true
 
 overrides:
-  metrics_generator_processors: ['local-blocks']
+  defaults:
+    metrics_generator:
+      processors: ['local-blocks', 'span-metrics', 'service-graphs']

@@ -2,7 +2,7 @@ networks:
   vispyr:
 
 services:
-  init:
+  init-tempo:
     image: &tempoImage grafana/tempo
     user: root
     entrypoint:
@@ -11,6 +11,16 @@ services:
       - "/var/tempo"
     volumes:
       - ./tempo/data:/var/tempo
+
+  init-prometheus:
+    image: &promImage prom/prometheus
+    user: root
+    entrypoint:
+      - "chown"
+      - "65534:65534"
+      - "/prometheus"
+    volumes:
+      - ./prometheus/data:/prometheus
 
   tempo:
     image: *tempoImage
@@ -22,72 +32,36 @@ services:
       - ./tempo/tempo.yaml:/etc/tempo.yaml
       - ./tempo/data:/var/tempo
     ports:
-      - "3200:3200" # tempo
+      - "3200:3200"
     depends_on:
-      - init
+      - init-tempo
 
   prometheus:
-    image: prom/prometheus
+    image: *promImage
     container_name: prometheus
     networks:
       - vispyr
     volumes:
-      - ./prometheus/prom-config.yaml:/etc/prometheus/prometheus.yml
+      - ./prometheus:/prometheus
     command:
       - --config.file=/etc/prometheus/prometheus.yml
       - --web.enable-remote-write-receiver
+      - --storage.tsdb.retention.time=30d
+    depends_on:
+      - init-prometheus
 
   pyroscope:
     image: grafana/pyroscope
     container_name: pyroscope
     volumes:
       - ./pyroscope/pyro-config.yaml:/etc/pyro-config.yaml
+      - ./pyroscope/data:/data
     command:
-      - -config.file=/etc/pyro-config.yaml
+      - --config.file=/etc/pyro-config.yaml
     networks:
       - vispyr
     ports:
       - 4040:4040
-
-  # agent-collector:
-  #   image: grafana/alloy
-  #   container_name: agent-collector
-  #   networks:
-  #     - vispyr
-  #   volumes:
-  #     - ./alloy/agent-config-local.alloy:/etc/alloy/config.alloy
-  #   ports:
-  #     - 4317:4317 # OTLP gRPC receiver
-  #     - 4318:4318 # OTLP http receiver
-  #     - 9999:9999 # Pyroscope listen server
-  #     - 12346:12346 # Debug UI
-  #   command:
-  #     - run
-  #     - /etc/alloy/config.alloy
-  #     - --server.http.listen-addr=0.0.0.0:12346
-  #   extra_hosts:
-  #     - "host.docker.internal:host-gateway"
-  #   depends_on:
-  #     - gateway-collector
-
-  # agent-collector:
-  #   image: otel/opentelemetry-collector-contrib
-  #   container_name: agent-collector
-  #   networks:
-  #     - vispyr
-  #   volumes:
-  #     - ./otelcol/otelcol.yaml:/etc/otelcol-contrib/config.yaml
-  #   ports:
-  #     - 13133:13133 # health_check extension
-  #     - 4317:4317 # OTLP gRPC receiver
-  #     - 4318:4318 # OTLP http receiver
-  #     - 55679:55679 # zpages extension
-  #   extra_hosts:
-  #     - "host.docker.internal:host-gateway"
-  #   depends_on:
-  #   - tempo
-  #   - pyroscope
-  #   - prometheus
 
   gateway-collector:
     image: grafana/alloy
@@ -97,15 +71,12 @@ services:
     volumes:
       - ./alloy/gateway-config.alloy:/etc/alloy/config.alloy
     ports:
-      - 4317:4317 # OTLP gRPC receiver
-      - 4318:4318 # OTLP http receiver
-      - 9090:9090 # Node metrics scraper http receiver
-      - 9999:9999 # Pyroscope http receiver
-      - 12345:12345 # Debug UI
+      - 4317:4317
+      - 9090:9090
+      - 9999:9999
     command:
       - run
       - /etc/alloy/config.alloy
-      - --server.http.listen-addr=0.0.0.0:12345
     depends_on:
     - tempo
     - pyroscope
@@ -113,12 +84,13 @@ services:
 
   grafana:
     image: grafana/grafana
+    user: "1000:1000"
     container_name: grafana
     networks:
       - vispyr
     volumes:
+      - ./grafana/data:/var/lib/grafana
       - ./grafana/grafana.ini:/etc/grafana/grafana.ini
-      - ./grafana/dashboards:/var/lib/grafana/dashboards
       - ./grafana/provisioning:/etc/grafana/provisioning
     ports:
       - 3000:3000
