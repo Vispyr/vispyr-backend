@@ -42,4 +42,4 @@ metrics_generator:
 overrides:
   defaults:
     metrics_generator:
-      processors: ['local-blocks', 'span-metrics', service-graphs]
+      processors: ['local-blocks', 'span-metrics', 'service-graphs']
