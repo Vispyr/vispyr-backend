@@ -71,9 +71,9 @@ services:
     volumes:
       - ./alloy/gateway-config.alloy:/etc/alloy/config.alloy
     ports:
-      - 4317:4317 # OTLP gRPC receiver
-      - 9090:9090 # Node metrics scraper http receiver
-      - 9999:9999 # Pyroscope http receiver
+      - 4317:4317
+      - 9090:9090
+      - 9999:9999
     command:
       - run
       - /etc/alloy/config.alloy
