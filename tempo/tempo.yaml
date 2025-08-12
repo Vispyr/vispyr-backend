@@ -23,7 +23,23 @@ compactor:
   compaction:
     block_retention: 720h
 
+metrics_generator:
+  processor:
+    local_blocks:
+      filter_server_spans: false
+      flush_to_storage: true
+  registry:
+    external_labels:
+      source: tempo
+  traces_storage:
+    path: /var/tempo/generator/traces
+  storage:
+    path: /var/tempo/generator/wal
+    remote_write:
+      - url: http://prometheus:9090/api/v1/write
+        send_exemplars: true
+
 overrides:
-   defaults:
-     metrics_generator:
-       processors: [local-blocks]
+  defaults:
+    metrics_generator:
+      processors: ['local-blocks', 'span-metrics', service-graphs]
