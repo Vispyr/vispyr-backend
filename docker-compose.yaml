@@ -43,7 +43,7 @@ services:
       - vispyr
     volumes:
       - ./prometheus/prom-config.yaml:/etc/prometheus/prometheus.yml
-      - ./prometheus/data:/prometheus
+      - ./prometheus:/prometheus
     command:
       - --config.file=/etc/prometheus/prometheus.yml
       - --web.enable-remote-write-receiver
@@ -55,6 +55,7 @@ services:
     container_name: pyroscope
     volumes:
       - ./pyroscope/pyro-config.yaml:/etc/pyro-config.yaml
+      - ./pyroscope/data:/data
     command:
       - --config.file=/etc/pyro-config.yaml
       - --storage.tsdb.retention.time=30d
