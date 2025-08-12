@@ -42,7 +42,6 @@ services:
     networks:
       - vispyr
     volumes:
-      - ./prometheus/prom-config.yaml:/etc/prometheus/prometheus.yml
       - ./prometheus:/prometheus
     command:
       - --config.file=/etc/prometheus/prometheus.yml
