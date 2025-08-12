@@ -1,3 +1,4 @@
 tempo/data
 prometheus/data
 grafana/data
+pyroscope/data
