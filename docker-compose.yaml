@@ -6,9 +6,9 @@ services:
     image: &tempoImage grafana/tempo
     user: root
     entrypoint:
-      - "chown"
-      - "10001:10001"
-      - "/var/tempo"
+      - 'chown'
+      - '10001:10001'
+      - '/var/tempo'
     volumes:
       - ./tempo/data:/var/tempo
 
@@ -16,15 +16,26 @@ services:
     image: &promImage prom/prometheus
     user: root
     entrypoint:
-      - "chown"
-      - "65534:65534"
-      - "/prometheus"
+      - 'chown'
+      - '65534:65534'
+      - '/prometheus'
     volumes:
       - ./prometheus/data:/prometheus
 
+  init-pyroscope:
+    image: alpine:latest
+    user: root
+    entrypoint:
+      - 'chown'
+      - '-R'
+      - '1000:1000'
+      - '/data'
+    volumes:
+      - ./pyroscope/data:/data
+
   tempo:
     image: *tempoImage
-    command: ["-config.file=/etc/tempo.yaml"]
+    command: ['-config.file=/etc/tempo.yaml']
     container_name: tempo
     networks:
       - vispyr
@@ -32,7 +43,7 @@ services:
       - ./tempo/tempo.yaml:/etc/tempo.yaml
       - ./tempo/data:/var/tempo
     ports:
-      - "3200:3200"
+      - '3200:3200'
     depends_on:
       - init-tempo
 
@@ -52,7 +63,7 @@ services:
 
   pyroscope:
     image: grafana/pyroscope
-    user: "1000:1000"
+    user: '1000:1000'
     container_name: pyroscope
     volumes:
       - ./pyroscope/pyro-config.yaml:/etc/pyro-config.yaml
@@ -63,6 +74,8 @@ services:
       - vispyr
     ports:
       - 4040:4040
+    depends_on:
+      - init-pyroscope
 
   gateway-collector:
     image: grafana/alloy
@@ -79,13 +92,13 @@ services:
       - run
       - /etc/alloy/config.alloy
     depends_on:
-    - tempo
-    - pyroscope
-    - prometheus
+      - tempo
+      - pyroscope
+      - prometheus
 
   grafana:
     image: grafana/grafana
-    user: "1000:1000"
+    user: '1000:1000'
     container_name: grafana
     networks:
       - vispyr
