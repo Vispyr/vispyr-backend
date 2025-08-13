@@ -52,6 +52,7 @@ services:
 
   pyroscope:
     image: grafana/pyroscope
+    user: "1000:1000"
     container_name: pyroscope
     volumes:
       - ./pyroscope/pyro-config.yaml:/etc/pyro-config.yaml
