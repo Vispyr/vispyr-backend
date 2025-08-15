@@ -132,7 +132,7 @@
             "scaleDistribution": {
               "type": "linear"
             },
-            "showPoints": "auto",
+            "showPoints": "always",
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -167,9 +167,7 @@
               "id": "byNames",
               "options": {
                 "mode": "exclude",
-                "names": [
-                  "Average CPU Utilization Across All Logical Cores"
-                ],
+                "names": ["Average CPU Utilization Across All Logical Cores"],
                 "prefix": "All except:",
                 "readOnly": true
               }
@@ -611,9 +609,7 @@
         "footer": {
           "countRows": false,
           "fields": "",
-          "reducer": [
-            "sum"
-          ],
+          "reducer": ["sum"],
           "show": false
         },
         "showHeader": true,
