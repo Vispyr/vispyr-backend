@@ -10,7 +10,10 @@ The purpose of Vispyr's backend is to ingest, store and present the telemetry da
 
 ## Architecture
 
-![Architecture Overview](assets/backend_architecture.svg)
+<div align="center">
+  <img src="assets/backend_architecture.svg" alt="Collector Overview" width="600">
+</div>
+
 
 ## Port Mapping
 
@@ -30,7 +33,9 @@ The purpose of Vispyr's backend is to ingest, store and present the telemetry da
 
 It's the front door of the observability pipeline receiving telemetry data from all distributed applications that were instrumented by the Vispyr agent. It batches the metrics and traces sent by OpenTelemetry SDK instrumentation in OTLP format via gRPC, and further processes these metrics into Prometheus format. From its HTTP ingestion points, Alloy also forwards Prometheus Node Exporter data received in OpenMetrics format, and profiles sent via the Pyroscope SDK instrumentation. The following diagram illustrates:
 
-![Collector Overview](assets/gateway_collector2.svg)
+<div align="center">
+  <img src="assets/gateway_collector2.svg" alt="Collector Overview" width="600">
+</div>
 
 ### Prometheus
 
