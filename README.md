@@ -1,53 +1,16 @@
 <div align="center">
   <a href="https://vispyr.com">
-    <img src="https://raw.githubusercontent.com/vispyr/.github/main/profile/assets/vispyr-banner.png" alt="Vispyr Banner" width="400">
+    <img src="./assets/vispyr-banner.png" alt="Vispyr Banner" width="400">
   </a>
 </div>
 
 # Backend
 
-The main purpose of Vispyr's backend is to ingest, store and present the telemetry data produced by the user's application with the Vispyr agent attached. Grafana Alloy - which itself wraps around OTel Collector - routes the flux of data from its ingestion point to each database. Prometheus, Tempo and Pyroscope store metrics, traces and profiling data, respectively. The `docker-compose.yml` file orchestrates the spinning up of all these services.
-
-## Data Flow
-
-1. **Telemetry Ingestion:** Applications send telemetry data to Grafana Alloy via OTLP endpoints.
-2. **Data Routing:** Alloy processes and routes data to appropriate backends:
-   - Metrics → Prometheus
-   - Traces → Tempo  
-   - Profiles → Pyroscope
-3. **Visualization:** Grafana queries all backends to provide unified dashboards.
+The purpose of Vispyr's backend is to ingest, store and present the telemetry data produced by the user's application with the Vispyr agent attached. Grafana Alloy - which itself wraps around the OTel Collector - routes the flux of data from its ingestion point to each database. Prometheus, Tempo and Pyroscope store metrics, traces and profiling data, respectively. A Grafana instance queries the databases and display the result on panels for visualization of the telemetry data. The `docker-compose.yml` file orchestrates the spinning up of all these services.
 
 ## Architecture
 
-```
-                              ┌─────────────┐
-                              │     App     │
-                              │(Telemetry)  │
-                              └─────────────┘
-                                     │
-                              ┌─────────────┐
-                              │Grafana Alloy│
-                              │ (Collector) │
-                              └─────────────┘
-                                /     |     \
-                               /      |      \
-                    ┌─────────────┐   |   ┌─────────────┐
-                    │ Prometheus  │   |   │   Tempo     │
-                    │ (Metrics)   │---|---│ (Traces)    │
-                    └─────────────┘   |   └─────────────┘
-                           │          |          │
-                           │    ┌─────────────┐  │
-                           │    │ Pyroscope   │  │
-                           │    │(Profiling)  │  │
-                           │    └─────────────┘  │
-                           │          │          │
-                           └──────────┼──────────┘
-                                      │
-                              ┌─────────────┐
-                              │   Grafana   │
-                              │ (Dashboard) │
-                              └─────────────┘
-```
+![Architecture Overview](assets/backend_architecture.svg)
 
 ## Port Mapping
 
@@ -65,38 +28,13 @@ The main purpose of Vispyr's backend is to ingest, store and present the telemet
 
 ### Grafana Alloy (Gateway Collector)
 
-It's the front door of the observability pipeline receiving telemetry data from all distributed applications that were instrumented via the Vispyr agent. It batches the metrics and traces sent through NodeJS instrumentation and further processes these metrics into Prometheus format. There are 3 flows of telemetry data passing through it:
+It's the front door of the observability pipeline receiving telemetry data from all distributed applications that were instrumented by the Vispyr agent. It batches the metrics and traces sent by OpenTelemetry SDK instrumentation in OTLP format via gRPC, and further processes these metrics into Prometheus format. From its HTTP ingestion points, Alloy also forwards Prometheus Node Exporter data received in OpenMetrics format, and profiles sent via the Pyroscope SDK instrumentation. The following diagram illustrates:
 
-
-```
-FLOW 1: OpenTelemetry
-┌─────────────────┐    OTLP     ┌───────────┐    Batch    ┌──────────────────┐
-│ OpenTelemetry   │ ──────────► │   Alloy   │ ──────────► │   OTLP to        │
-│ SDKs            │  gRPC:4317  │           │             │     OpenMetrics  │
-│ (Node.js)       │             │           │             │  ┌─────────────┐ │
-└─────────────────┘             └───────────┘             │  │ Metrics ────┼─┼──► Prometheus
-                                                          └──│─────────────│─┘    :9090/write
-                                                             │ Traces ─────┼───► Tempo
-                                                             │             │     :4317 OTLP
-                                                             └─────────────┘ 
-
-FLOW 2: Prometheus
-┌─────────────────┐   HTTP:9090  ┌───────────┐ remote_write ┌──────────────┐
-│ Prometheus      │ ──────────►  │   Alloy   │ ───────────► │ Prometheus   │
-│ Node Exporter   │   (push)     │           │              │ :9090/write  │
-└─────────────────┘              └───────────┘              └──────────────┘
-
-FLOW 3: Pyroscope
-┌─────────────────┐   HTTP:9999  ┌───────────┐   forward    ┌──────────────┐
-│ Pyroscope       │ ──────────►  │   Alloy   │ ───────────► │ Pyroscope    │
-│ SDK             │   (profiles) │           │              │ :4040        │
-└─────────────────┘              └───────────┘              └──────────────┘
-
-```
+![Collector Overview](assets/gateway_collector.svg)
 
 ### Prometheus
 
-Prometheus receives metrics that are being pushed via its default remote write endpoint: `/api/v1/write` on port 9090. It's acting purely as a passive storage TSDB, i.e., it doesn't scrape data from anywhere. Vispyr's custom PromQL queries in Grafana are used to build the dashboards from the data stored here.
+Prometheus receives metrics that are being pushed via its default remote write endpoint: `/api/v1/write` on port 9090. It's acting purely as a passive storage TSDB, i.e., it doesn't scrape data from anywhere. Vispyr uses Prometheus default configurations for all of its features. 
 
 ### Tempo
 
@@ -113,11 +51,11 @@ Applications ──► Alloy ──► Tempo ──────► S3 Storage
 
 ### Pyroscope
 
-Similar to Prometheus, Pyroscope is not configured much beyond its default options: local filesystem storage, HTTP server on port 4040, retention period of 30 days and default API routes. The only overriding configuration is so that Pyroscope won't profile itself. 
+Pyroscope stores data for profiles produced by the Pyroscope SDK. Profiles are received over HTTP and stored on disk within Pyroscope’s internal database. Pyroscope’s retention is based on capacity, so a specific retention period is not specified.
 
 ### Grafana
 
-Grafana is provisioned with Vispyr's dashboard on its homepage. To build each panel from this dashboard, the above databases are queried in their respective language: PromQL for Prometheus, TraceQL for Tempo and FlameQL for Pyroscope.
+Grafana is provisioned with Vispyr's dashboard on its homepage. To build each panel from this dashboard, the above databases are queried in their respective languages: PromQL for Prometheus, TraceQL for Tempo and FlameQL for Pyroscope. Vispyr's custom queries are used to build the dashboards from the data stored there.
 
 # Learn more
 
