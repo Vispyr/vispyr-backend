@@ -6,7 +6,7 @@
 
 # Backend
 
-The purpose of Vispyr's backend is to ingest, store and present the telemetry data produced by the user's application with the Vispyr agent attached. Grafana Alloy - which itself wraps around the OTel Collector - routes the flux of data from its ingestion point to each database. Prometheus, Tempo and Pyroscope store metrics, traces and profiling data, respectively. A Grafana instance queries the databases and display the result on panels for visualization of the telemetry data. The `docker-compose.yml` file orchestrates the spinning up of all these services.
+The purpose of Vispyr's backend is to ingest, store, and present the telemetry data produced by the user's application with the Vispyr agent attached. Grafana Alloy - which itself wraps around the OTel Collector - routes the flux of data from its ingestion point to each database. Prometheus, Tempo, and Pyroscope store metrics, traces, and profiling data, respectively. A Grafana instance queries the databases and displays the result on panels for visualization of the telemetry data. The `docker-compose.yml` file orchestrates the spinning up of all these services.
 
 ## Architecture
 
@@ -43,7 +43,7 @@ Prometheus receives metrics that are being pushed via its default remote write e
 
 ### Tempo
 
-Tempo receives OTLP traces from Alloy via gRPC on port 4317 and generates metrics from these traces by the enabling of its `metrics_genetor` feature. An S3 bucket is used for object retention of 30 days. Tempo spins up an HTTP server on port 3200 that is used by Grafana to query traces.
+Tempo receives OTLP traces from Alloy via gRPC on port 4317 and generates metrics from these traces by enabling its `metrics_generator` feature. An S3 bucket is used for object retention of 30 days. Tempo spins up an HTTP server on port 3200 that is used by Grafana to query traces.
 
 ```
 Applications ──► Alloy ──► Tempo ──────► S3 Storage
@@ -60,9 +60,8 @@ Pyroscope stores data for profiles produced by the Pyroscope SDK. Profiles are r
 
 ### Grafana
 
-Grafana is provisioned with Vispyr's dashboard on its homepage. To build each panel from this dashboard, the above databases are queried in their respective languages: PromQL for Prometheus, TraceQL for Tempo and FlameQL for Pyroscope. Vispyr's custom queries are used to build the dashboards from the data stored there.
+Grafana is provisioned with Vispyr's dashboard on its homepage. To build each panel from this dashboard, the above databases are queried in their respective languages: PromQL for Prometheus, TraceQL for Tempo, and FlameQL for Pyroscope. Vispyr's custom queries are used to build the dashboards from the data stored there.
 
 # Learn more
 
-For a more detailed and comprehensive description of Vispyr, along the motivation for its creation, please read our [case study](https://vispyr.com "Go to Case Study").
-
+For a more detailed and comprehensive description of Vispyr, along with the motivation for its creation, please read our [case study](https://vispyr.com "Go to Case Study").
