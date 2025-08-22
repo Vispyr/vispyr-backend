@@ -17,21 +17,20 @@ The purpose of Vispyr's backend is to ingest, store, and present the telemetry d
 
 ## Port Mapping
 
-| Service | Port |
-|---------|------|
-| Alloy | 4317 |
-| Alloy | 9090 |
-| Alloy | 9999 |
-| Alloy | 12345 |
-| Grafana | 3000 |
-| Pyroscope | 4040 |
-| Tempo | 3200 |
+| Service | Port | Purpose |
+|---------|------|--------|
+| Gateway Collector (Alloy) | 4317 | OTLP traces and metrics via gRPC |
+| Gateway Collector (Alloy) | 9090 | System metrics HTTP entry point |
+| Gateway Collector (Alloy) | 9999 | Pyroscope profiles ingestion |
+| Grafana | 3000 | Vispyr dashboard |
+| Pyroscope | 4040 | Pyroscope UI |
+| Tempo | 3200 | Tempo API |
 
 ## Service Details
 
-### Grafana Alloy (Gateway Collector)
+### Gateway Collector (Grafana Alloy)
 
-It's the front door of the observability pipeline receiving telemetry data from all distributed applications that were instrumented by the Vispyr agent. It batches the metrics and traces sent by OpenTelemetry SDK instrumentation in OTLP format via gRPC, and further processes these metrics into Prometheus format. From its HTTP ingestion points, Alloy also forwards Prometheus Node Exporter data received in OpenMetrics format, and profiles sent via the Pyroscope SDK instrumentation. The following diagram illustrates:
+The Gateway Collector is the front door of the observability pipeline receiving telemetry data from all distributed applications that were instrumented by the Vispyr Agent. It batches the metrics and traces sent by the user application via Vipyr's Agent Collector in OTLP format via gRPC, and further processes these metrics into Prometheus format. From its HTTP ingestion points, the Gateway Collector also forwards system metrics received in OpenMetrics format, and profiles sent via the Agent's Pyroscope SDK instrumentation. The following diagram illustrates this process:
 
 <div align="center">
   <img src="assets/gateway_collector3.svg" alt="Collector Overview" width="600">
@@ -43,7 +42,7 @@ Prometheus receives metrics that are being pushed via its default remote write e
 
 ### Tempo
 
-Tempo receives OTLP traces from Alloy via gRPC on port 4317 and generates metrics from these traces by enabling its `metrics_generator` feature. An S3 bucket is used for object retention of 30 days. Tempo spins up an HTTP server on port 3200 that is used by Grafana to query traces.
+Tempo receives OTLP traces from the Gateway Collector via gRPC on port 4317 and generates metrics from these traces by enabling its `metrics_generator` feature. An S3 bucket is used for object retention of 30 days. Tempo spins up an HTTP server on port 3200 that is used by Grafana to query traces.
 
 ```
 Applications ──► Alloy ──► Tempo ──────► S3 Storage
