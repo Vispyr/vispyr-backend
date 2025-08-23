@@ -11,7 +11,7 @@ The purpose of Vispyr's backend is to ingest, store, and present the telemetry d
 ## Architecture
 
 <div align="center">
-  <img src="assets/backend_architecture2.svg" alt="Collector Overview" width="600">
+  <img src="assets/backend_architecture3.svg" alt="Collector Overview" width="600">
 </div>
 
 
