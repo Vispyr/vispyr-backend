@@ -11,7 +11,7 @@ The purpose of Vispyr's backend is to ingest, store, and present the telemetry d
 ## Architecture
 
 <div align="center">
-  <img src="assets/backend_architecture.svg" alt="Collector Overview" width="600">
+  <img src="assets/backend_architecture2.svg" alt="Collector Overview" width="600">
 </div>
 
 
@@ -62,5 +62,7 @@ Pyroscope stores data for profiles produced by the Pyroscope SDK. Profiles are r
 Grafana is provisioned with Vispyr's dashboard on its homepage. To build each panel from this dashboard, the above databases are queried in their respective languages: PromQL for Prometheus, TraceQL for Tempo, and FlameQL for Pyroscope. Vispyr's custom queries are used to build the dashboards from the data stored there.
 
 # Learn more
+
+Please refer to the [CLI documentation]() for deployment.
 
 For a more detailed and comprehensive description of Vispyr, along with the motivation for its creation, please read our [case study](https://vispyr.com "Go to Case Study").
