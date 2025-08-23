@@ -33,7 +33,7 @@ The purpose of Vispyr's backend is to ingest, store, and present the telemetry d
 The Gateway Collector is the front door of the observability pipeline receiving telemetry data from all distributed applications that were instrumented by the Vispyr Agent. It batches the metrics and traces sent by the user application via Vipyr's Agent Collector in OTLP format via gRPC, and further processes these metrics into Prometheus format. From its HTTP ingestion points, the Gateway Collector also forwards system metrics received in OpenMetrics format, and profiles sent via the Agent's Pyroscope SDK instrumentation. The following diagram illustrates this process:
 
 <div align="center">
-  <img src="assets/gateway_collector3.svg" alt="Collector Overview" width="600">
+  <img src="assets/gateway_collector4.svg" alt="Collector Overview" width="600">
 </div>
 
 ### Prometheus
@@ -63,6 +63,6 @@ Grafana is provisioned with Vispyr's dashboard on its homepage. To build each pa
 
 # Learn more
 
-Please refer to the [CLI documentation]() for deployment.
+Please refer to the [CLI documentation](https://github.com/Vispyr/vispyr-cli "Go to CLI page") for deployment.
 
 For a more detailed and comprehensive description of Vispyr, along with the motivation for its creation, please read our [case study](https://vispyr.com "Go to Case Study").
