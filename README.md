@@ -59,7 +59,7 @@ Pyroscope stores data for profiles produced by the Pyroscope SDK. Profiles are r
 
 ### Grafana
 
-Grafana is provisioned with Vispyr's dashboard on its homepage. To build each panel from this dashboard, the above databases are queried in their respective languages: PromQL for Prometheus, TraceQL for Tempo, and FlameQL for Pyroscope. Vispyr's custom queries are used to build the dashboards from the data stored there.
+Grafana is provisioned with Vispyr's dashboard on its homepage. To build each panel from this dashboard, the above databases are queried in their respective languages: PromQL for Prometheus, TraceQL for Tempo, and FlameQL for Pyroscope. Vispyr's custom queries are used to build the dashboards from the data stored there. Nginx sits as reverse proxy between Grafana and the user accessing Vispyr.
 
 # Learn more
 
