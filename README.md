@@ -44,15 +44,6 @@ Prometheus receives metrics that are being pushed via its default remote write e
 
 Tempo receives OTLP traces from the Gateway Collector via gRPC on port 4317 and generates metrics from these traces by enabling its `metrics_generator` feature. An S3 bucket is used for object retention of 30 days. Tempo spins up an HTTP server on port 3200 that is used by Grafana to query traces.
 
-```
-Applications ──► Alloy ──► Tempo ──────► S3 Storage
-    (traces)      (OTLP)    │              (long-term)
-                            │
-                            ▼
-                    Generated Metrics ──► Prometheus
-                    (RED metrics)         (via remote_write)
-```
-
 ### Pyroscope
 
 Pyroscope stores data for profiles produced by the Pyroscope SDK. Profiles are received over HTTP and stored on disk within Pyroscope’s internal database. Pyroscope’s retention is based on capacity, so a specific retention period is not specified.
